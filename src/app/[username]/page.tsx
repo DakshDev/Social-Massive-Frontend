@@ -7,9 +7,13 @@ export interface ProfilePageProps {
 
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const { username } = await params;
-  const response = await getUser(username);
+  const countUnique = (username.match(/%40/g) || []).length;
+  if (countUnique != 1) return notFound();
+  const filtered_username = username.split("").splice(3).join("");
+  if (!username.startsWith("%40")) return notFound();
+  const response = await getUser(filtered_username.toLocaleLowerCase());
+  console.log(filtered_username);
   if (response === null) return notFound();
-  console.log(response);
 
   return <div>{JSON.stringify(response?.user)}</div>;
 };
