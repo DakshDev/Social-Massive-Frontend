@@ -1,4 +1,4 @@
-import Menu from "./components/menu";
+import Menu from "./components/menu/menu";
 import "./globals.css";
 import { primary_font, secondary_font } from "@/global/font";
 
