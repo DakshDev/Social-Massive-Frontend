@@ -2,12 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const data = req.cookies.get("token");
+  const token = req.cookies.get("token")?.value;
+  const { pathname } = req.nextUrl;
 
-  if ((req.nextUrl.pathname.startsWith("/auth/create") && req.nextUrl.pathname.endsWith("/auth/create")) || (req.nextUrl.pathname.startsWith("/auth/login") && req.nextUrl.pathname.endsWith("/auth/login"))) {
-    if (data && data.name) return NextResponse.redirect(new URL("/", req.url));
+  // Auth
+  if (pathname === "/auth/create" || pathname === "/auth/login") {
+    if (token) return NextResponse.redirect(new URL("/", req.url));
     return NextResponse.next();
   }
-  if (!data) return NextResponse.redirect(new URL("/auth/create", req.url));
+  if (!token) return NextResponse.redirect(new URL("/auth/login", req.url));
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/((?!_next|favicon.ico).*)"],
+};

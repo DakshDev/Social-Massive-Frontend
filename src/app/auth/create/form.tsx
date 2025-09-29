@@ -46,8 +46,10 @@ export default function CreateAccountForm() {
     if (!email) return;
     if (!password) return;
 
+    console.log(_env.backend_api_origin);
+
     axios
-      .post(`http://localhost:8080/api/auth/create`, {
+      .post(`${_env.backend_api_origin}/api/auth/create`, {
         username,
         name,
         email,
