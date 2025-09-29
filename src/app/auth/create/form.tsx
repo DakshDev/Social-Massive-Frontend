@@ -3,7 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import axios from "axios";
+import _env from "@/config/env";
+import axios from "axios";
 import Link from "next/link";
 
 // ==========================================
@@ -27,7 +28,38 @@ export default function CreateAccountForm() {
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const from = e.currentTarget;
-    return new FormData(from);
+    const formData = new FormData(from);
+    // Get Data
+    const year = formData.get("year");
+    const month = formData.get("month");
+    const date = formData.get("date");
+    const username = formData.get("username");
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const birth = new Date(`${year}-${month}-${date}`);
+
+    // Validate Data
+    if (!year || !month || !date) return;
+    if (!username) return;
+    if (!name) return;
+    if (!email) return;
+    if (!password) return;
+
+    axios
+      .post(`http://localhost:8080/api/auth/create`, {
+        username,
+        name,
+        email,
+        birth,
+        password,
+      })
+      .then((resp) => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error(error.response?.data);
+      });
   };
   return (
     <div className="max-w-md w-full p-5 bg-accent/40 rounded-sm">
@@ -37,9 +69,9 @@ export default function CreateAccountForm() {
         <Input type="text" name="username" placeholder="Username" />
         <Input type="email" name="email" placeholder="Email" />
         <div className="grid grid-cols-3 gap-2 items-center">
-          <SelectOptionUI placeholder="Year" options={years} />
-          <SelectOptionUI placeholder="Month" options={months} />
-          <SelectOptionUI placeholder="Date" options={dates} />
+          <SelectOptionUI name="year" placeholder="Year" options={years} />
+          <SelectOptionUI name="month" placeholder="Month" options={months} />
+          <SelectOptionUI name="date" placeholder="Date" options={dates} />
         </div>
         <Input type="password" name="password" placeholder="Password" />
         <Button type="submit">Sign up</Button>
@@ -54,9 +86,9 @@ export default function CreateAccountForm() {
   );
 }
 
-export function SelectOptionUI({ placeholder, options }: { placeholder: string; options: string[] | number[] }) {
+export function SelectOptionUI({ placeholder, options, name }: { placeholder: string; options: string[] | number[]; name: string }) {
   return (
-    <Select>
+    <Select name={name}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
