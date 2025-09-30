@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
   const { pathname } = req.nextUrl;
+  console.log(token);
 
   // Auth
   if (pathname === "/auth/create" || pathname === "/auth/login") {

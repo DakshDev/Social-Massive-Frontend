@@ -49,17 +49,20 @@ export default function CreateAccountForm() {
     if (!password) return;
 
     axios
-      .post(`${_env.backend_api_origin}/api/auth/create`, {
-        username,
-        name,
-        email,
-        birth,
-        password,
-      })
-      .then((resp) => {
-        console.log(resp);
-        // window.location.reload();
-      })
+      .post(
+        `${_env.backend_api_origin}/api/auth/create`,
+        {
+          username,
+          name,
+          email,
+          birth,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then(() => window.location.reload())
       .catch((error) => {
         console.error(error.response?.data);
       });
