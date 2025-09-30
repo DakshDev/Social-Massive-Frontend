@@ -27,6 +27,8 @@ for (let index = initialDate; index <= finalDate; index++) {
 export default function CreateAccountForm() {
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(_env);
+
     const from = e.currentTarget;
     const formData = new FormData(from);
     // Get Data
@@ -46,8 +48,6 @@ export default function CreateAccountForm() {
     if (!email) return;
     if (!password) return;
 
-    console.log(_env.backend_api_origin);
-
     axios
       .post(`${_env.backend_api_origin}/api/auth/create`, {
         username,
@@ -57,7 +57,8 @@ export default function CreateAccountForm() {
         password,
       })
       .then((resp) => {
-        window.location.reload();
+        console.log(resp);
+        // window.location.reload();
       })
       .catch((error) => {
         console.error(error.response?.data);
