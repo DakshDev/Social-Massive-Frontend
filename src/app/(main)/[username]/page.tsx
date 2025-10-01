@@ -2,6 +2,7 @@ import { getUser } from "@/utils/apis";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Header from "./header";
+import InnerSections from "./inner_sections";
 
 export interface ProfilePageProps {
   params: { username: string };
@@ -32,6 +33,7 @@ async function Profile({ username }: { username: string }) {
   return (
     <div className="max-w-6xl w-full mx-auto p-4">
       <Header />
+      <InnerSections />
     </div>
   );
 }

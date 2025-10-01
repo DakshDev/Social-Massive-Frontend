@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import _env from "@/config/env";
 import axios from "axios";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 // ==========================================
 const currentDate = new Date();
@@ -24,7 +25,18 @@ for (let index = initialDate; index <= finalDate; index++) {
 }
 // ==========================================
 
+{
+  /* <LoaderCircle /> */
+  /* <CircleCheck /> */
+  /* <CircleX /> */
+}
 export default function CreateAccountForm() {
+  const [usernameVal, setUsernameVal] = useState("");
+
+  useEffect(() => {
+    console.log(usernameVal);
+  }, [usernameVal]);
+
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(_env);
@@ -72,7 +84,7 @@ export default function CreateAccountForm() {
       <h1 className="text-2xl font-semibold text-center mb-5">Create Account</h1>
       <form onSubmit={formSubmitHandler} className="grid gap-2 text-sm">
         <Input type="text" id="full-name" name="name" placeholder="Full Name" />
-        <Input type="text" name="username" placeholder="Username" />
+        <Input type="text" onChange={(e) => setUsernameVal(e.currentTarget.value)} name="username" placeholder="Username" />
         <Input type="email" name="email" placeholder="Email" />
         <div className="grid grid-cols-3 gap-2 items-center">
           <SelectOptionUI name="year" placeholder="Year" options={years} />
