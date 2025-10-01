@@ -1,6 +1,7 @@
 import { getUser } from "@/utils/apis";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import Header from "./header";
 
 export interface ProfilePageProps {
   params: { username: string };
@@ -24,11 +25,15 @@ async function Page({ params }: ProfilePageProps) {
 }
 
 async function Profile({ username }: { username: string }) {
-  const response = await getUser(username);
-  console.log(response);
-  if (response === null) return notFound();
+  // const response = await getUser(username);
+  // console.log(response);
+  // if (response === null) return notFound();
 
-  return <div>{JSON.stringify(response)}</div>;
+  return (
+    <div className="max-w-6xl w-full mx-auto p-4">
+      <Header />
+    </div>
+  );
 }
 
 export default Page;
