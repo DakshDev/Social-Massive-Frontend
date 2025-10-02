@@ -9,7 +9,7 @@ export default function InnerLayout({
     <div className="flex h-screen">
       <Menu />
       <div className="w-full">
-        <main className="container mx-auto">{children}</main>
+        <main className="container mx-auto p-4">{children}</main>
       </div>
     </div>
   );

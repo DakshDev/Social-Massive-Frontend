@@ -31,7 +31,7 @@ async function Profile({ username }: { username: string }) {
   // if (response === null) return notFound();
 
   return (
-    <div className="max-w-6xl w-full mx-auto p-4">
+    <div className="max-w-6xl w-full mx-auto">
       <Header />
       <InnerSections />
     </div>
