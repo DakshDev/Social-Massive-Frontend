@@ -7,7 +7,7 @@ import _env from "@/config/env";
 import { checkValidUsername } from "@/utils/apis";
 import debounce from "@/utils/debounce";
 import axios, { AxiosError } from "axios";
-import { CircleCheck, CircleX, LoaderCircle } from "lucide-react";
+import { CircleCheck, CircleX, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
@@ -44,6 +44,9 @@ export default function CreateAccountForm() {
   const [errorEmail, setErrorEmail] = useState<null | string | boolean>(null);
   const [errorBirth, setErrorBirth] = useState<null | string | boolean>(null);
   const [errorPassword, setErrorPassword] = useState<null | string | boolean>(null);
+  // Other
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Validatations
   const formValidation = useCallback(() => {
@@ -133,6 +136,7 @@ export default function CreateAccountForm() {
     const result = formValidation();
     if (!result) return;
     if (!isvalidUsername) return setErrorUsername("username already exist");
+    setIsLoading(true);
 
     const birth = new Date(`${year}-${month}-${date}`);
 
@@ -154,6 +158,9 @@ export default function CreateAccountForm() {
           return toast.error(err.response?.data?.error || "Invalid Creation");
         }
         toast.error("unknown error");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -232,17 +239,31 @@ export default function CreateAccountForm() {
           />
           {errorBirth && <p className='text-red-400'>{errorBirth}</p>}
         </div>
-        <div>
+        <div className='relative'>
           <Input
-            type='password'
+            type={`${showPassword ? "text" : "password"}`}
             name='password'
             placeholder='Password'
             onChange={(e) => setPassword(e.currentTarget.value)}
             className={`${errorPassword == false && "placeholder:text-red-400"}`}
           />
+          {showPassword ? (
+            <Eye
+              onClick={() => setShowPassword(false)}
+              className='absolute right-2 top-1.75 size-5 cursor-pointer'
+            />
+          ) : (
+            <EyeOff
+              onClick={() => setShowPassword(true)}
+              className='absolute right-2 top-1.75 size-5 cursor-pointer'
+            />
+          )}
           {errorPassword && <p className='text-red-400'>{errorPassword}</p>}
         </div>
-        <Button type='submit'>Sign up</Button>
+        <Button type='submit'>
+          Sign up
+          {isLoading && <LoaderCircle className='size-4 animate-spin text-black' />}
+        </Button>
       </form>
       <p className='text-center mt-2.5'>
         Already Have an account?&nbsp;

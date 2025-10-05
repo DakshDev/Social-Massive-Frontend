@@ -7,6 +7,7 @@ import axios, { AxiosError } from "axios";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import { useCallback, useMemo, useState } from "react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 
 export default function LoginAccountForm() {
   const [email, setEmail] = useState<string | null>(null);
@@ -14,6 +15,9 @@ export default function LoginAccountForm() {
   // Error State
   const [emailError, setEmailError] = useState<string | null | true>(null);
   const [passwordError, setPasswordError] = useState<string | null | true>(null);
+  // Other
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Validataion
   const validation = useCallback(() => {
@@ -43,6 +47,7 @@ export default function LoginAccountForm() {
     e.preventDefault();
     const result = validation();
     if (!result) return;
+    setIsLoading(true);
 
     const data = {
       email,
@@ -58,6 +63,9 @@ export default function LoginAccountForm() {
           return toast.error(err.response?.data.error || "Invalid login credentials");
         }
         toast.error("Unknown Error");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
   return (
@@ -82,18 +90,29 @@ export default function LoginAccountForm() {
           />
           {typeof emailError == "string" && <p className='text-red-400 lowercase'>{emailError}</p>}
         </div>
-        <div>
+        <div className='relative'>
           <Input
-            onChange={(e) => setPassword(e.currentTarget.value)}
-            type='password'
+            type={`${showPassword ? "text" : "password"}`}
             name='password'
             placeholder='Password'
+            onChange={(e) => setPassword(e.currentTarget.value)}
             className={`${passwordError == true && "placeholder:text-red-400"}`}
           />
+          {showPassword ? (
+            <Eye
+              onClick={() => setShowPassword(false)}
+              className='absolute right-2 top-1.75 size-5 cursor-pointer'
+            />
+          ) : (
+            <EyeOff
+              onClick={() => setShowPassword(true)}
+              className='absolute right-2 top-1.75 size-5 cursor-pointer'
+            />
+          )}
           {typeof passwordError == "string" && <p className='text-red-400 lowercase'>{passwordError}</p>}
         </div>
 
-        <Button type='submit'>Sign in</Button>
+        <Button type='submit'>Sign in {isLoading && <LoaderCircle className='size-4 animate-spin text-black' />}</Button>
       </form>
       <p className='text-center mt-2.5'>
         Don&apos;t Have an account?&nbsp;
