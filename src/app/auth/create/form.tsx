@@ -1,12 +1,15 @@
 "use client";
 
+import SelectOptionUI from "@/components/other/selectOptionUI";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import _env from "@/config/env";
+import { checkValidUsername } from "@/utils/apis";
+import debounce from "@/utils/debounce";
 import axios from "axios";
+import { CircleCheck, CircleX, LoaderCircle } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 // ==========================================
 const currentDate = new Date();
@@ -25,101 +28,223 @@ for (let index = initialDate; index <= finalDate; index++) {
 }
 // ==========================================
 
-{
-  /* <LoaderCircle /> */
-  /* <CircleCheck /> */
-  /* <CircleX /> */
-}
 export default function CreateAccountForm() {
-  const [usernameVal, setUsernameVal] = useState("");
+  const [username, setUsername] = useState<null | string>(null);
+  const [email, setEmail] = useState<null | string>(null);
+  const [fullName, setFullName] = useState<null | string>(null);
+  const [year, setYear] = useState<null | string>(null);
+  const [month, setMonth] = useState<null | string>(null);
+  const [date, setDate] = useState<null | string>(null);
+  const [password, setPassword] = useState<null | string>(null);
+  const [isvalidUsername, setIsvalidUsername] = useState<boolean | null | "loading">(null);
+  // Error for
+  const [errorFullname, setErrorFullname] = useState<null | string | boolean>(null);
+  const [errorUsername, setErrorUsername] = useState<null | string | boolean>(null);
+  const [errorEmail, setErrorEmail] = useState<null | string | boolean>(null);
+  const [errorBirth, setErrorBirth] = useState<null | string | boolean>(null);
+  const [errorPassword, setErrorPassword] = useState<null | string | boolean>(null);
+
+  // Validatations
+  const formValidatation = useCallback(() => {
+    let isValid = true;
+    // Full Name
+    if (!fullName) {
+      setErrorFullname(false);
+      isValid = false;
+    } else {
+      if (fullName.length < 4) {
+        setErrorFullname("minimum 4 letter");
+        isValid = false;
+      }
+    }
+    // Username
+    if (!username) {
+      setErrorUsername(false);
+      isValid = false;
+    } else {
+      if (username.length < 4) {
+        setErrorUsername("minimum 4 letter");
+        isValid = false;
+      }
+    }
+    // Email
+    if (!email) {
+      setErrorEmail(false);
+      isValid = false;
+    } else {
+      if (!email.includes("@") || !email.includes(".")) {
+        setErrorEmail("email without (@) or (.) isn't valid");
+        isValid = false;
+      }
+    }
+    // Date of Birth
+    if (!year || !month || !date) {
+      setErrorBirth(false);
+      isValid = false;
+    }
+
+    // Password
+    if (!password) {
+      setErrorPassword(false);
+      isValid = false;
+    } else {
+      if (password.length < 7) {
+        setErrorPassword("password minimum length must be 6");
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  }, [fullName, username, email, year, month, date, password]);
+
+  // Search Valid Username
+  // ================================================
+  const searchUsernameIsValid = async (username: string) => {
+    if (!username) return;
+    const resp = await checkValidUsername(username);
+    console.log(resp);
+    if (resp) return setIsvalidUsername(true);
+    setIsvalidUsername(null);
+  };
+
+  const searchWithDebounce = useMemo(() => {
+    return debounce(searchUsernameIsValid, 500);
+  }, []);
 
   useEffect(() => {
-    console.log(usernameVal);
-  }, [usernameVal]);
+    if (username === null) return;
+    searchWithDebounce(username);
+    setIsvalidUsername("loading");
+  }, [searchWithDebounce, username]);
+  // ================================================
 
+  // Form Submission
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(_env);
+    const result = formValidatation();
+    if (!result) {
+      setTimeout(() => {
+        setErrorFullname(null);
+        setErrorUsername(null);
+        setErrorEmail(null);
+        setErrorBirth(null);
+        setErrorPassword(null);
+      }, 5000);
+      return;
+    }
+    if (!isvalidUsername) return;
 
-    const from = e.currentTarget;
-    const formData = new FormData(from);
-    // Get Data
-    const year = formData.get("year");
-    const month = formData.get("month");
-    const date = formData.get("date");
-    const username = formData.get("username");
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
     const birth = new Date(`${year}-${month}-${date}`);
 
-    // Validate Data
-    if (!year || !month || !date) return;
-    if (!username) return;
-    if (!name) return;
-    if (!email) return;
-    if (!password) return;
+    const data = {
+      username: username?.toLowerCase(),
+      name: fullName?.toLowerCase(),
+      email: email?.toLowerCase(),
+      birth,
+      password,
+    };
 
     axios
-      .post(
-        `${_env.backend_api_origin}/api/auth/create`,
-        {
-          username,
-          name,
-          email,
-          birth,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
-      )
+      .post(`${_env.backend_api_origin}/api/auth/create`, data, {
+        withCredentials: true,
+      })
       .then(() => window.location.reload())
       .catch((error) => {
         console.error(error.response?.data);
       });
   };
+
   return (
-    <div className="max-w-md w-full p-5 bg-accent/40 rounded-sm">
-      <h1 className="text-2xl font-semibold text-center mb-5">Create Account</h1>
-      <form onSubmit={formSubmitHandler} className="grid gap-2 text-sm">
-        <Input type="text" id="full-name" name="name" placeholder="Full Name" />
-        <Input type="text" onChange={(e) => setUsernameVal(e.currentTarget.value)} name="username" placeholder="Username" />
-        <Input type="email" name="email" placeholder="Email" />
-        <div className="grid grid-cols-3 gap-2 items-center">
-          <SelectOptionUI name="year" placeholder="Year" options={years} />
-          <SelectOptionUI name="month" placeholder="Month" options={months} />
-          <SelectOptionUI name="date" placeholder="Date" options={dates} />
+    <div className='max-w-md w-full p-5 bg-accent/40 rounded-sm'>
+      <h1 className='text-2xl font-semibold text-center mb-5'>Create Account</h1>
+      <form
+        onSubmit={formSubmitHandler}
+        className='grid gap-2 text-sm'
+      >
+        <div>
+          <Input
+            type='text'
+            id='full-name'
+            name='name'
+            placeholder='Full Name'
+            onChange={(e) => setFullName(e.currentTarget.value)}
+            className={`${errorFullname == false && "placeholder:text-red-400"}`}
+          />
+          {errorFullname && <p className='text-red-400'>{errorFullname}</p>}
         </div>
-        <Input type="password" name="password" placeholder="Password" />
-        <Button type="submit">Sign up</Button>
+        <div className='relative'>
+          <Input
+            type='text'
+            onChange={(e) => setUsername(e.currentTarget.value)}
+            name='username'
+            placeholder='Username'
+            className={`${errorUsername == false && "placeholder:text-red-400"}`}
+          />
+          {username &&
+            (isvalidUsername == "loading" ? (
+              <LoaderCircle className='absolute right-2 top-2 size-5 animate-spin' />
+            ) : isvalidUsername == null ? (
+              <CircleX className='absolute right-2 top-2 size-5 text-red-500' />
+            ) : (
+              <CircleCheck className='absolute right-2 top-2 size-5  text-emerald-500' />
+            ))}
+          {errorUsername && <p className='text-red-400'>{errorUsername}</p>}
+        </div>
+        <div>
+          <Input
+            type='text'
+            name='email'
+            placeholder='Email'
+            onChange={(e) => setEmail(e.currentTarget.value)}
+            className={`${errorEmail == false && "placeholder:text-red-400"}`}
+          />
+          {errorEmail && <p className='text-red-400'>{errorEmail}</p>}
+        </div>
+        <div className='grid grid-cols-3 gap-x-2 items-center'>
+          <SelectOptionUI
+            name='year'
+            placeholder='Year'
+            options={years}
+            setChangedValue={setYear}
+            placeholderWaning={errorBirth}
+          />
+          <SelectOptionUI
+            name='month'
+            placeholder='Month'
+            options={months}
+            setChangedValue={setMonth}
+            placeholderWaning={errorBirth}
+          />
+          <SelectOptionUI
+            name='date'
+            placeholder='Date'
+            options={dates}
+            setChangedValue={setDate}
+            placeholderWaning={errorBirth}
+          />
+          {errorBirth && <p className='text-red-400'>{errorBirth}</p>}
+        </div>
+        <div>
+          <Input
+            type='password'
+            name='password'
+            placeholder='Password'
+            onChange={(e) => setPassword(e.currentTarget.value)}
+            className={`${errorPassword == false && "placeholder:text-red-400"}`}
+          />
+          {errorPassword && <p className='text-red-400'>{errorPassword}</p>}
+        </div>
+        <Button type='submit'>Sign up</Button>
       </form>
-      <p className="text-center mt-2.5">
+      <p className='text-center mt-2.5'>
         Already Have an account?&nbsp;
-        <Link href="/auth/login" className="text-blue-500 hover:underline">
+        <Link
+          href='/auth/login'
+          className='text-blue-500 hover:underline'
+        >
           Sign in
         </Link>
       </p>
     </div>
-  );
-}
-
-export function SelectOptionUI({ placeholder, options, name }: { placeholder: string; options: string[] | number[]; name: string }) {
-  return (
-    <Select name={name}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {options.length != 0 &&
-            options.map((each) => (
-              <SelectItem key={each} value={each.toString()} className="capitalize">
-                {each}
-              </SelectItem>
-            ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
   );
 }

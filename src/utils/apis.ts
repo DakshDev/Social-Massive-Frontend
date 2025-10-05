@@ -1,15 +1,36 @@
 import _env from "@/config/env";
 import axios from "axios";
 
+// Get User
 async function getUser(username: string) {
   try {
     if (!username) return null;
-    const response = await axios.get(`${_env.backend_api_origin}/get/${username}`);
+    const allowed = "qwertyuiopasdfghjklzxcvbnm1234567890_".split("");
+    const result = [...username].every((char) => allowed.includes(char));
+    if (!result) return null;
+    // next
+    const response = await axios.get(`${_env.backend_api_origin}/api/get/${username}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 }
 
-export { getUser };
+// Check Username
+async function checkValidUsername(username: string) {
+  try {
+    if (!username) return null;
+    const allowed = "qwertyuiopasdfghjklzxcvbnm1234567890_".split("");
+    const result = [...username].every((char) => allowed.includes(char));
+    if (!result) return null;
+    // next
+    const response = await axios.post(`${_env.backend_api_origin}/api/auth/${username}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export { getUser, checkValidUsername };
