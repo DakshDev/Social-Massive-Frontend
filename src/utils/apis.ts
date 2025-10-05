@@ -20,11 +20,10 @@ async function getUser(username: string) {
 // Check Username
 async function checkValidUsername(username: string) {
   try {
-    if (!username) return null;
-    const allowed = "qwertyuiopasdfghjklzxcvbnm1234567890_".split("");
-    const result = [...username].every((char) => allowed.includes(char));
+    if (!username || username.length < 4) return null;
+    const validateNames = new Set("qwertyuiopasdfghjklzxcvbnm1234567890_".split(""));
+    const result = [...username.toLowerCase()].every((char) => validateNames.has(char));
     if (!result) return null;
-    // next
     const response = await axios.post(`${_env.backend_api_origin}/api/auth/${username}`);
     return response.data;
   } catch (error) {

@@ -45,7 +45,7 @@ export default function CreateAccountForm() {
   const [errorPassword, setErrorPassword] = useState<null | string | boolean>(null);
 
   // Validatations
-  const formValidatation = useCallback(() => {
+  const formValidation = useCallback(() => {
     let isValid = true;
     // Full Name
     if (!fullName) {
@@ -102,37 +102,36 @@ export default function CreateAccountForm() {
   const searchUsernameIsValid = async (username: string) => {
     if (!username) return;
     const resp = await checkValidUsername(username);
-    console.log(resp);
     if (resp) return setIsvalidUsername(true);
     setIsvalidUsername(null);
   };
 
-  const searchWithDebounce = useMemo(() => {
-    return debounce(searchUsernameIsValid, 500);
-  }, []);
+  const searchWithDebounce = useMemo(() => debounce(searchUsernameIsValid, 500), []);
 
   useEffect(() => {
-    if (username === null) return;
-    searchWithDebounce(username);
-    setIsvalidUsername("loading");
+    if (username) {
+      searchWithDebounce(username);
+      setIsvalidUsername("loading");
+      const validateNames = new Set("qwertyuiopasdfghjklzxcvbnm1234567890_".split(""));
+      const result = [...username.toLowerCase()].every((char) => validateNames.has(char));
+      if (!result) return setErrorUsername("username without (special) characters and (space)");
+    }
   }, [searchWithDebounce, username]);
   // ================================================
+
+  // Reset On State Change
+  useMemo(() => fullName && setErrorFullname(null), [fullName]);
+  useMemo(() => username && setErrorUsername(null), [username]);
+  useMemo(() => email && setErrorEmail(null), [email]);
+  useMemo(() => year && month && date && setErrorBirth(null), [year, month, date]);
+  useMemo(() => password && setErrorPassword(null), [password]);
 
   // Form Submission
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = formValidatation();
-    if (!result) {
-      setTimeout(() => {
-        setErrorFullname(null);
-        setErrorUsername(null);
-        setErrorEmail(null);
-        setErrorBirth(null);
-        setErrorPassword(null);
-      }, 5000);
-      return;
-    }
-    if (!isvalidUsername) return;
+    const result = formValidation();
+    if (!result) return;
+    if (!isvalidUsername) return setErrorUsername("username already exist");
 
     const birth = new Date(`${year}-${month}-${date}`);
 
@@ -158,6 +157,7 @@ export default function CreateAccountForm() {
     <div className='max-w-md w-full p-5 bg-accent/40 rounded-sm'>
       <h1 className='text-2xl font-semibold text-center mb-5'>Create Account</h1>
       <form
+        autoComplete='off'
         onSubmit={formSubmitHandler}
         className='grid gap-2 text-sm'
       >
