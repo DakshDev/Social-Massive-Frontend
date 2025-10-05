@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import _env from "@/config/env";
 import { checkValidUsername } from "@/utils/apis";
 import debounce from "@/utils/debounce";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { CircleCheck, CircleX, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 // ==========================================
 const currentDate = new Date();
@@ -148,13 +149,20 @@ export default function CreateAccountForm() {
         withCredentials: true,
       })
       .then(() => window.location.reload())
-      .catch((error) => {
-        console.error(error.response?.data);
+      .catch((err) => {
+        if (err instanceof AxiosError) {
+          return toast.error(err.response?.data?.error || "Invalid Creation");
+        }
+        toast.error("unknown error");
       });
   };
 
   return (
     <div className='max-w-md w-full p-5 bg-accent/40 rounded-sm'>
+      <ToastContainer
+        hideProgressBar={true}
+        limit={1}
+      />
       <h1 className='text-2xl font-semibold text-center mb-5'>Create Account</h1>
       <form
         autoComplete='off'
