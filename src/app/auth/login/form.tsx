@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import { useCallback, useMemo, useState } from "react";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import setCookie from "@/utils/setCookie";
 
 export default function LoginAccountForm() {
   const [email, setEmail] = useState<string | null>(null);
@@ -57,7 +58,20 @@ export default function LoginAccountForm() {
       .post(`${_env.backend_api_origin}/api/auth/login`, data, {
         withCredentials: true,
       })
-      .then(() => window.location.reload())
+      .then((res) => {
+        if (typeof res.data.data !== "object") return null;
+        const { username } = res.data.data;
+        setCookie("username", username)
+          .then(() => {
+            window.location.reload();
+          })
+          .catch((err) => {
+            if (err instanceof Error) {
+              return toast.error(err.name);
+            }
+            toast.error("Cookie error");
+          });
+      })
       .catch((err) => {
         if (err instanceof AxiosError) {
           return toast.error(err.response?.data.error || "Invalid login credentials");

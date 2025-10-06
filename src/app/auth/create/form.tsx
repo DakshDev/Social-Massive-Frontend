@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import _env from "@/config/env";
 import { checkValidUsername } from "@/utils/apis";
 import debounce from "@/utils/debounce";
+import setCookie from "@/utils/setCookie";
 import axios, { AxiosError } from "axios";
 import { CircleCheck, CircleX, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Link from "next/link";
@@ -152,7 +153,20 @@ export default function CreateAccountForm() {
       .post(`${_env.backend_api_origin}/api/auth/create`, data, {
         withCredentials: true,
       })
-      .then(() => window.location.reload())
+      .then((res) => {
+        if (typeof res.data.data !== "object") return null;
+        const { username } = res.data.data;
+        setCookie("username", username)
+          .then(() => {
+            window.location.reload();
+          })
+          .catch((err) => {
+            if (err instanceof Error) {
+              return toast.error(err.name);
+            }
+            toast.error("Cookie error");
+          });
+      })
       .catch((err) => {
         if (err instanceof AxiosError) {
           return toast.error(err.response?.data?.error || "Invalid Creation");

@@ -26,12 +26,11 @@ async function Page({ params }: ProfilePageProps) {
 }
 
 async function Profile({ username }: { username: string }) {
-  // const response = await getUser(username);
-  // console.log(response);
-  // if (response === null) return notFound();
+  const response = await getUser(username);
+  if (response === null) return notFound();
 
   return (
-    <div className="max-w-6xl w-full mx-auto">
+    <div className='max-w-6xl w-full mx-auto'>
       <Header />
       <InnerSections />
     </div>
