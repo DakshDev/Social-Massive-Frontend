@@ -1,5 +1,13 @@
+"use client";
 import { Dispatch, SetStateAction } from "react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export default function SelectOptionUI({
   placeholder,
@@ -23,18 +31,16 @@ export default function SelectOptionUI({
       }}
       name={name}
     >
-      <SelectTrigger className={`w-full ${placeholderWaning == false && "data-[placeholder]:text-red-400"}`}>
+      <SelectTrigger
+        className={`w-full ${placeholderWaning == false && "data-[placeholder]:text-red-400"}`}
+      >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           {options.length != 0 &&
             options.map((each) => (
-              <SelectItem
-                key={each}
-                value={each.toString()}
-                className='capitalize'
-              >
+              <SelectItem key={each} value={each.toString()} className="capitalize">
                 {each}
               </SelectItem>
             ))}

@@ -26,13 +26,20 @@ async function Page({ params }: ProfilePageProps) {
 }
 
 async function Profile({ username }: { username: string }) {
-  const response = await getUser(username);
-  if (response === null) return notFound();
+  const userInfo = await getUser(username);
+  if (userInfo === null) return notFound();
 
   return (
-    <div className='max-w-6xl w-full mx-auto'>
-      <Header />
-      <InnerSections />
+    <div className="w-full mx-auto">
+      <Header userInfo={userInfo} />
+      <div className="grid grid-cols-3">
+        <InnerSections />
+        <div>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus minus excepturi
+          voluptatibus adipisci minima tenetur! Natus neque veritatis deserunt aperiam. Expedita
+          cumque neque earum aliquam id soluta repudiandae consectetur ea?
+        </div>
+      </div>
     </div>
   );
 }

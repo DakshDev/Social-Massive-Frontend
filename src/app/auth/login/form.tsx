@@ -59,12 +59,10 @@ export default function LoginAccountForm() {
         withCredentials: true,
       })
       .then((res) => {
-        if (typeof res.data.data !== "object") return null;
-        const { username } = res.data.data;
+        if (typeof res.data !== "object") return null;
+        const { username } = res.data;
         setCookie("username", username)
-          .then(() => {
-            window.location.reload();
-          })
+          .then(() => window.location.reload())
           .catch((err) => {
             if (err instanceof Error) {
               return toast.error(err.name);
@@ -74,7 +72,7 @@ export default function LoginAccountForm() {
       })
       .catch((err) => {
         if (err instanceof AxiosError) {
-          return toast.error(err.response?.data.error || "Invalid login credentials");
+          return toast.error(err.response?.data.error || err.name);
         }
         toast.error("Unknown Error");
       })
@@ -83,57 +81,51 @@ export default function LoginAccountForm() {
       });
   };
   return (
-    <div className='max-w-md w-full p-5 bg-accent/40 rounded-sm'>
-      <ToastContainer
-        limit={1}
-        hideProgressBar={true}
-      />
-      <h1 className='text-2xl font-semibold text-center mb-5'>Login Account</h1>
-      <form
-        autoComplete='off'
-        onSubmit={formSubmitHandler}
-        className='grid gap-2 text-sm'
-      >
+    <div className="max-w-md w-full p-5 bg-accent/40 rounded-sm">
+      <ToastContainer limit={1} hideProgressBar={true} />
+      <h1 className="text-2xl font-semibold text-center mb-5">Login Account</h1>
+      <form autoComplete="off" onSubmit={formSubmitHandler} className="grid gap-2 text-sm">
         <div>
           <Input
             onChange={(e) => setEmail(e.currentTarget.value)}
-            type='text'
-            name='email'
-            placeholder='Email'
+            type="text"
+            name="email"
+            placeholder="Email"
             className={`${emailError == true && "placeholder:text-red-400"}`}
           />
-          {typeof emailError == "string" && <p className='text-red-400 lowercase'>{emailError}</p>}
+          {typeof emailError == "string" && <p className="text-red-400 lowercase">{emailError}</p>}
         </div>
-        <div className='relative'>
+        <div className="relative">
           <Input
             type={`${showPassword ? "text" : "password"}`}
-            name='password'
-            placeholder='Password'
+            name="password"
+            placeholder="Password"
             onChange={(e) => setPassword(e.currentTarget.value)}
             className={`${passwordError == true && "placeholder:text-red-400"}`}
           />
           {showPassword ? (
             <Eye
               onClick={() => setShowPassword(false)}
-              className='absolute right-2 top-1.75 size-5 cursor-pointer'
+              className="absolute right-2 top-1.75 size-5 cursor-pointer"
             />
           ) : (
             <EyeOff
               onClick={() => setShowPassword(true)}
-              className='absolute right-2 top-1.75 size-5 cursor-pointer'
+              className="absolute right-2 top-1.75 size-5 cursor-pointer"
             />
           )}
-          {typeof passwordError == "string" && <p className='text-red-400 lowercase'>{passwordError}</p>}
+          {typeof passwordError == "string" && (
+            <p className="text-red-400 lowercase">{passwordError}</p>
+          )}
         </div>
 
-        <Button type='submit'>Sign in {isLoading && <LoaderCircle className='size-4 animate-spin text-black' />}</Button>
+        <Button type="submit">
+          Sign in {isLoading && <LoaderCircle className="size-4 animate-spin text-black" />}
+        </Button>
       </form>
-      <p className='text-center mt-2.5'>
+      <p className="text-center mt-2.5">
         Don&apos;t Have an account?&nbsp;
-        <Link
-          href='/auth/create'
-          className='text-blue-500 hover:underline'
-        >
+        <Link href="/auth/create" className="text-blue-500 hover:underline">
           Sign up
         </Link>
       </p>

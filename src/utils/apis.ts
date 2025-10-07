@@ -6,10 +6,10 @@ async function getUser(username: string) {
   try {
     if (!username) return null;
     const allowed = "qwertyuiopasdfghjklzxcvbnm1234567890_".split("");
-    const result = [...username].every((char) => allowed.includes(char));
+    const result = [...username.toLowerCase()].every((char) => allowed.includes(char));
     if (!result) return null;
     // next
-    const response = await axios.get(`${_env.backend_api_origin}/api/get/${username}`);
+    const response = await axios.get(`${_env.backend_api_origin}/api/public/userinfo/${username}`);
     return response.data;
   } catch (error) {
     console.error(error);

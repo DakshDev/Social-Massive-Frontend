@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 
-function BioExpander() {
-  const bio = "Lorem ipsum dolor sit, amet consecthg gfd nobis unde provident exercitationem fd quidem voluptas ullam possimus corrupti sit perspiciatis";
+function BioExpander({ content }: { content: string | null }) {
+  if (!content) return null;
+  const bio =
+    "Lorem ipsum dolor sit, amet consecthg gfd nobis unde provident exercitationem fd quidem voluptas ullam possimus corrupti sit perspiciatis";
   let [expandBtn, setExpandBtn] = useState(false);
 
   if (bio.split("").length > 70) {
@@ -12,14 +14,20 @@ function BioExpander() {
         {expandBtn ? (
           <p>
             {bio}&nbsp;
-            <button onClick={() => setExpandBtn((prev) => !prev)} className="text-blue-500 hover:underline">
+            <button
+              onClick={() => setExpandBtn((prev) => !prev)}
+              className="text-blue-500 hover:underline"
+            >
               show less
             </button>
           </p>
         ) : (
           <p>
             {bio.split("").splice(0, 70).join("")}&nbsp;
-            <button onClick={() => setExpandBtn((prev) => !prev)} className="text-blue-500 hover:underline">
+            <button
+              onClick={() => setExpandBtn((prev) => !prev)}
+              className="text-blue-500 hover:underline"
+            >
               show more
             </button>
           </p>
