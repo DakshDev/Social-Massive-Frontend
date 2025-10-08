@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Header from "./header";
 import InnerSections from "./inner_sections";
+import AboutSection from "./about";
+import { UserType } from "@/types/user_types";
 
 export interface ProfilePageProps {
   params: { username: string };
@@ -19,26 +21,28 @@ async function Page({ params }: ProfilePageProps) {
   return (
     <div>
       <Suspense fallback={<p>Loading data...</p>}>
-        <Profile username={filtered_username} />
+        <Profile uname={filtered_username} />
       </Suspense>
     </div>
   );
 }
 
-async function Profile({ username }: { username: string }) {
-  const userInfo = await getUser(username);
+async function Profile({ uname }: { uname: string }) {
+  const userInfo = await getUser(uname);
   if (userInfo === null) return notFound();
+  const { avatar, banner, bio, birth, createdAt, email, gender, name, username, website } = userInfo as UserType;
 
   return (
-    <div className="w-full mx-auto">
-      <Header userInfo={userInfo} />
-      <div className="grid grid-cols-3">
-        <InnerSections />
-        <div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus minus excepturi
-          voluptatibus adipisci minima tenetur! Natus neque veritatis deserunt aperiam. Expedita
-          cumque neque earum aliquam id soluta repudiandae consectetur ea?
+    <div className='w-full mx-auto'>
+      <Header
+        avatar={avatar}
+        banner={banner}
+      />
+      <div className='flex gap-4 mt-14'>
+        <div className='w-md h-fit sticky top-4 p-4 bg-accent/50'>
+          <AboutSection />
         </div>
+        <InnerSections />
       </div>
     </div>
   );
