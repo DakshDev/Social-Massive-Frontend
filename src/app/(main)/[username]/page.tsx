@@ -28,15 +28,15 @@ async function Page({ params }: ProfilePageProps) {
 }
 
 async function Profile({ uname }: { uname: string }) {
-  const userInfo = await getUser(uname);
-  if (userInfo === null) return notFound();
-  const { avatar, banner, bio, birth, createdAt, email, gender, name, username, website } = userInfo as UserType;
+  // const userInfo = await getUser(uname);
+  // if (userInfo === null) return notFound();
+  // const { avatar, banner } = userInfo as UserType;
 
   return (
     <div className='w-full mx-auto'>
       <Header
-        avatar={avatar}
-        banner={banner}
+        avatar={"avatar"}
+        banner={"banner"}
       />
       <div className='flex gap-4 mt-14'>
         <div className='w-md h-fit sticky top-4 p-4 bg-accent/50'>
