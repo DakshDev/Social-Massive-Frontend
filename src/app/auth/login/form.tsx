@@ -62,7 +62,7 @@ export default function LoginAccountForm() {
         if (typeof res.data !== "object") return null;
         const { username } = res.data;
         setCookie("username", username)
-          .then(() => window.location.reload())
+          .then(() => {})
           .catch((err) => {
             if (err instanceof Error) {
               return toast.error(err.name);
