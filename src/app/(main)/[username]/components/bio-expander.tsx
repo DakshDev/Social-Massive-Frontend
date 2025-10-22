@@ -3,20 +3,20 @@
 import { useState } from "react";
 
 function BioExpander({ content }: { content: string | null }) {
+  const [expandBtn, setExpandBtn] = useState(false);
   if (!content) return null;
   const bio =
     "Lorem ipsum dolor sit, amet consecthg gfd nobis unde provident exercitationem fd quidem voluptas ullam possimus corrupti sit perspiciatis";
-  let [expandBtn, setExpandBtn] = useState(false);
 
   if (bio.split("").length > 70) {
     return (
-      <div className="text-sm">
+      <div className='text-sm'>
         {expandBtn ? (
           <p>
             {bio}&nbsp;
             <button
               onClick={() => setExpandBtn((prev) => !prev)}
-              className="text-blue-500 hover:underline"
+              className='text-blue-500 hover:underline'
             >
               show less
             </button>
@@ -26,7 +26,7 @@ function BioExpander({ content }: { content: string | null }) {
             {bio.split("").splice(0, 70).join("")}&nbsp;
             <button
               onClick={() => setExpandBtn((prev) => !prev)}
-              className="text-blue-500 hover:underline"
+              className='text-blue-500 hover:underline'
             >
               show more
             </button>
@@ -36,7 +36,7 @@ function BioExpander({ content }: { content: string | null }) {
     );
   }
 
-  return <p className="max-w-75">{bio}</p>;
+  return <p className='max-w-75'>{bio}</p>;
 }
 
 export default BioExpander;
