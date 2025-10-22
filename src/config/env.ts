@@ -1,6 +1,5 @@
 const _env = Object.freeze({
-  backend_api_origin: "https://social-massive-backend.onrender.com",
-  node_env: "development" as "development" | "production",
+  backend_api_origin: "http://localhost:3000",
 });
 
 export default _env;
