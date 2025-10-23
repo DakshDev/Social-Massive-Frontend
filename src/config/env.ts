@@ -1,5 +1,5 @@
 const _env = Object.freeze({
-  backend_api_origin: "https://social-massive-backend.onrender.com",
+  backend_api_origin: "https://api.eaglzy.store",
 });
 
 export default _env;
