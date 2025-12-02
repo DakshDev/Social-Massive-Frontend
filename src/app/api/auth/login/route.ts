@@ -4,11 +4,9 @@ import axios, { AxiosError } from "axios";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const axios_resp = await axios.post(
-      `${_env.backend_api_origin}/api/auth/login`,
-      body,
-      { withCredentials: true }
-    );
+    const axios_resp = await axios.post(`${_env.backend_api_origin}/api/auth/login`, body, {
+      withCredentials: true,
+    });
 
     // ✅ Handle "set-cookie" header properly
     const setCookie = axios_resp.headers["set-cookie"];
@@ -17,7 +15,9 @@ export async function POST(request: Request) {
 
     if (Array.isArray(setCookie)) {
       for (const cookie of setCookie) headers.append("set-cookie", cookie);
-    } else if (setCookie) { headers.set("set-cookie", setCookie) }
+    } else if (setCookie) {
+      headers.set("set-cookie", setCookie);
+    }
 
     return new Response(
       JSON.stringify({
@@ -27,10 +27,9 @@ export async function POST(request: Request) {
       }),
       { status: 200, headers }
     );
-
   } catch (err: unknown) {
     if (err instanceof AxiosError) {
-      const error = err.response?.data?.error || "unknown error"
+      const error = err.response?.data?.error || "unknown error";
       if (err.status == 404) return new Response(JSON.stringify({ error }), { status: err.status });
       if (err.status == 400) return new Response(JSON.stringify({ error }), { status: err.status });
       return new Response(JSON.stringify({ error }), { status: err.status });

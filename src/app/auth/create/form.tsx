@@ -152,7 +152,7 @@ export default function CreateAccountForm() {
       .post(`/api/auth/create`, data, {withCredentials: true})
       .then((res) => {
         if (typeof res.data !== "object") return null;
-        const { username } = res.data;
+        const { username } = res.data.data;
         setCookie("username", username)
           .then(() => window.location.reload())
           .catch((err) => {
